@@ -1,0 +1,16 @@
+// 6511043 zy11043 Zhang Huayan
+
+
+package stock;
+
+
+public class GUIClient{
+    public static void main(String[] args){
+	
+
+	
+
+    }
+
+
+}
