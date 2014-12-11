@@ -1,0 +1,103 @@
+// 6511043 zy11043 Zhang Huayan
+//                              -*- Mode: Java -*- 
+// GUI.java --- 
+// Filename: GUI.java
+// Description: 
+// Author: Zhang Huayan
+// ID number: 6511043
+// E-mail: zy11043@nottingham.edu.cn / MeowAlienOwO@gmail.com
+// Version: 
+// 
+
+// Commentary: 
+// 
+// 
+
+// Change Log:
+// Status: 
+// Table of Contents: 
+// 
+//     Update #: 39
+// 
+
+// Code:
+
+package stock;
+
+
+import java.awt.*;
+import javax.swing.*;
+
+
+class GUI{
+    // variables
+    private static GUI gui = null;
+    private JFrame frame;
+    private JPanel panel;
+    private Datapool datapool;
+
+    // left side:
+    private JComponent left;
+    private JButton login;
+    private JButton logout;
+    private JButton ask;
+    private JButton bid;
+
+    // top-right:
+    private JComponent topRight;
+    private JTextArea tickmsg;
+    private JLabel ticketlabel;
+    
+    // bottom-right:
+    private JComponent bottomRight;
+    private JTitledBoarder border;
+    private JButton refresh;
+    private JButton cancel;
+    
+    // constructor
+    private GUI(){
+    
+	this.frame = new JFrame("GUI Client");
+	this.panel = new JPanel();
+	this.datapool;
+
+	// left side:
+	this.left   = new JComponent();
+	this.login  = new JButton("Log in");
+	this.logout = new JButton("Log out");
+	this.ask    = new JButton("ASK");
+	this.bid    = new JButton("BID");
+
+	// top-right:
+	this.topRight    = new JComponent();
+	this.tickmsg     = new JTextArea();
+	this.ticketlabel = new JLabel("Stock Ticker");
+    
+	// bottom-right:
+	this.bottomRight = new JComponent();
+	this.border      = new JTitledBoarder();
+	this.refresh     = new JButton("Refresh");
+	this.cancel      = new JButton("Cancel...");
+    	
+    }
+    // setter
+
+    // gette
+    public static GUI getGUI(){
+	if(GUI.gui != null){
+	    GUI.gui = new GUI();
+	}
+	
+	return gui;
+    }
+    // methods
+
+    public void update(){
+
+	
+    }
+
+}
+
+// 
+// GUI.java ends here
