@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 83
+//     Update #: 164
 // 
 
 // Code:
@@ -25,33 +25,44 @@
 package stock;
 
 
+
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-
+import javax.swing.table.*;
 class GUI{
     // variables
     private static GUI gui = null;
     private JFrame frame;
     private JPanel panel;
     private Datapool datapool;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 600;
 
     // left side:
-    private JComponent left;
+    private JPanel left;
+    private JPanel account;
     private JButton login;
     private JButton logout;
+    private JPanel trade;
     private JButton ask;
     private JButton bid;
 
+
+    // right:
+    private JPanel right;
     // top-right:
-    private JComponent topRight;
+    private JPanel topRight;
+    private JScrollPane tickScrollPane;
     private JTextArea tickmsg;
-    private JLabel ticketlabel;
+    private TitledBorder tickborder;
     
     // bottom-right:
-    private JComponent bottomRight;
+    private JPanel bottomRight;
     private TitledBorder bookBorder;
     private JTable book;
+    private JPanel operation;
     private JButton refresh;
     private JButton cancel;
     
@@ -61,47 +72,85 @@ class GUI{
 	this.frame = new JFrame("GUI Client");
 	this.panel = new JPanel(new BorderLayout());
 	// this.datapool;
-	frame.setSize(800, 600);
+
+
+	frame.setSize(GUI.WIDTH, GUI.HEIGHT);
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	// left side:
-	this.left   = new JPanel();
+	this.left   = new JPanel(new BorderLayout(5, 0));
+	this.account = new JPanel(new BorderLayout());
 	this.login  = new JButton("Log in");
 	this.logout = new JButton("Log out");
+	this.trade  = new JPanel(new GridLayout(2, 1));
 	this.ask    = new JButton("ASK");
 	this.bid    = new JButton("BID");
-	// left.setSize(200, 200);
-	left.add(login);
-	left.add(logout);
-	left.add(ask);
-	left.add(bid);
+	
+	account.add("Center", login);
+	account.add("South", logout);
+	trade.add(ask);
+	trade.add(bid);
+	left.add("North", account);
+	left.add("Center", trade);
+	left.setSize(200, GUI.HEIGHT);
+	login.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+		    LoginFrame lf = new LoginFrame();
+		}
+	    });
+
+	ask.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+		    
+		    TradeFrame ask = new TradeFrame("ASK");
+
+		}
+	    });
+	bid.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+		    
+		    TradeFrame bid = new TradeFrame("BID");
+
+		}
+	    });
+
+
+
+	// right:
+	this.right = new JPanel(new GridLayout(2, 1));
 	// top-right:
-	this.topRight    = new JPanel();
-	this.tickmsg     = new JTextArea(5, 10);
-	this.ticketlabel = new JLabel("Stock Ticker");
-	// topRight.setSize(200, 200);
-	topRight.add(tickmsg);
-	tickmsg.setSize(200, 200);
-	tickmsg.setVisible(true);
-	topRight.add(ticketlabel);
+	this.topRight    = new JPanel(new BorderLayout());
+	this.tickmsg     = new JTextArea();
+	this.tickborder = new TitledBorder("Stock Ticker");
+	
+	tickScrollPane = new JScrollPane(tickmsg);
+	tickScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+	topRight.add("Center", tickScrollPane);
+	
+	topRight.setBorder(tickborder);
+	
+
 	// bottom-right:
 	String[] columnNames = {"ID", "Type", "Company", "Volume", "Price"};
-
-
-	this.bottomRight = new JPanel();
-	this.bookBorder      = new TitledBorder("Your Offer Book");
-	// this.book        = new JTable(null, columnNames);
-	this.book        = new JTable(3, 5);
+	this.bottomRight = new JPanel(new BorderLayout());
+	this.bookBorder  = new TitledBorder("Your Offer Book");
+	this.book        = new JTable(new DefaultTableModel(columnNames, 0));
+	this.operation   = new JPanel(new GridLayout(1, 2));
 	this.refresh     = new JButton("Refresh");
 	this.cancel      = new JButton("Cancel...");
-    	// bottomRight.add(border);
+
 	bottomRight.setBorder(bookBorder);
-	bottomRight.add(book);
-	bottomRight.add(refresh);
-	bottomRight.add(cancel);
-	
+	operation.add(refresh);
+	operation.add(cancel);
+	bottomRight.add("Center", new JScrollPane(book));
+	bottomRight.add("South", operation);
+
+	right.add("Center", topRight);
+	right.add("South", bottomRight);
 	panel.add("West", left);
-	panel.add("North", topRight);
-	panel.add("South", bottomRight);
+	panel.add("Center", right);
+
+	frame.add(panel);
+	frame.setVisible(true);	
 	
     }
     // setter
@@ -111,16 +160,13 @@ class GUI{
 	if(GUI.gui == null){
 	    GUI.gui = new GUI();
 	}
-	
+
 	return GUI.gui;
     }
     // methods
 
     public void update(){
 
-	frame.add(panel);
-	// frame.pack();
-	frame.setVisible(true);
 	
     }
 

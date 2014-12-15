@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 14
+//     Update #: 34
 // 
 
 // Code:
@@ -31,38 +31,43 @@ package stock;
 
 public class GUIClient{
 
-    private boolean running = true;
-    private int port = 1234;
-    
     public static void main(String[] args){
 
-	GUI gui = GUI.getGUI();
-	gui.update();
-	// initialize();
+	try {
+	    if(args.length != 0) throw new Exception("Illegal argument");
 
-	// while(running){
 
-	//     update();
+	GUIClient client = new GUIClient();
+	client.initialize();
+
+	// while(client.running){
+
+	//     client.update();
 	// }
-	
-	
-	// end();
+
+	}
+	catch (Throwable e) {
+	    System.out.println("Error " + e.getMessage());
+	    e.printStackTrace();
+	}
     }
-
-
+    // variables
+    private boolean running = true;
+    private int port = 1234;
+    private GUI gui;
+    private Datapool Datapool;
+    // methods
     private void initialize(){
 	
-	
-
-	// connect();
+	gui = GUI.getGUI();	
+		
     }
 
     private void update(){
-
-    }
-
-    private void end(){
-
+	// datapool.update();
+	
+	gui.update();
+	
     }
 
     private boolean running(){
