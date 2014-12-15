@@ -55,16 +55,16 @@ class TradeFrame{
 	this.ok = new JButton("OK");
 	this.cancel = new JButton("Cancel");
 	
-	this.companyPanel = new JPanel();
+	this.companyPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	companyPanel.add(companyLabel);
 	companyPanel.add(company);
-	this.volumePanel  = new JPanel();
+	this.volumePanel  = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	volumePanel.add(volumeLabel);
 	volumePanel.add(volume);
- 	this.pricePanel   = new JPanel();
+ 	this.pricePanel   = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	pricePanel.add(priceLabel);
 	pricePanel.add(price);
-	this.buttonPanel  = new JPanel();
+	this.buttonPanel  = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	buttonPanel.add(ok);
 	buttonPanel.add(cancel);
 	cancel.addActionListener(new ActionListener(){
@@ -87,6 +87,7 @@ class TradeFrame{
 	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	frame.pack();
 	frame.setVisible(true);
+	frame.setResizable(false);
 
 
     }

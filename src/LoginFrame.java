@@ -36,30 +36,31 @@ class LoginFrame{
     private JLabel serverLabel, usrLabel, passwdLabel;
     private JPanel panel, serverPanel, usrPanel, passwdPanel, buttonPanel;
     private JButton login, cancel;
+    private Datapool datapool;
 
-    LoginFrame(){
+    LoginFrame(Datapool datapool){
 	this.frame       = new JFrame("Log in");
-	this.server      = new JTextField("address-string:port-number");
-	this.usrname     = new JTextField("username");
-	this.passwd      = new JPasswordField(6);
+	this.server      = new JTextField(10);
+	this.usrname     = new JTextField(10);
+	this.passwd      = new JPasswordField(10);
 	this.serverLabel = new JLabel("Server:");
 	this.usrLabel    = new JLabel("Username:");
 	this.passwdLabel = new JLabel("Password:");
 	this.login       = new JButton("Login");
 	this.cancel      = new JButton("Cancel");
-	
+	this.datapool    = datapool;
 
-	this.serverPanel = new JPanel();
+	this.serverPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	serverPanel.add(serverLabel);
 	serverPanel.add(server);
 	
-	this.usrPanel    = new JPanel();
+	this.usrPanel    = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	usrPanel.add(usrLabel);
 	usrPanel.add(usrname);
-	this.passwdPanel = new JPanel();
+	this.passwdPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	passwdPanel.add(passwdLabel);
 	passwdPanel.add(passwd);
-	this.buttonPanel = new JPanel();
+	this.buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	buttonPanel.add(login);
 	buttonPanel.add(cancel);
 
@@ -72,11 +73,24 @@ class LoginFrame{
 	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	frame.pack();
 	frame.setVisible(true);
+	frame.setResizable(false);
 
 	cancel.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
 
 		    frame.dispose();
+		}
+	    });
+
+	ok.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+
+		    try{
+			data
+
+		    }catch(Expection e){
+
+		    }
 		}
 	    });
     }

@@ -31,7 +31,7 @@ class Datapool{
     LinkedList<String> inputMsg;
     LinkedList<String> outputMsg;
     boolean login = true;
-
+    
     
     // constructor
 
