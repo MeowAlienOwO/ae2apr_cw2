@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 164
+//     Update #: 167
 // 
 
 // Code:
@@ -67,11 +67,13 @@ class GUI{
     private JButton cancel;
     
     // constructor
-    private GUI(){
+    private GUI(Datapool datapool){
     
 	this.frame = new JFrame("GUI Client");
 	this.panel = new JPanel(new BorderLayout());
-	// this.datapool;
+	this.datapool = datapool;
+
+
 
 
 	frame.setSize(GUI.WIDTH, GUI.HEIGHT);
@@ -94,7 +96,7 @@ class GUI{
 	left.setSize(200, GUI.HEIGHT);
 	login.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
-		    LoginFrame lf = new LoginFrame();
+		    LoginFrame lf = new LoginFrame(datapool);
 		}
 	    });
 

@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 10
+//     Update #: 29
 // 
 
 // Code:
@@ -26,18 +26,59 @@ package stock;
 
 import java.util.*;
 
-class Datapool{
+class Datapool implements DataObservable{
     // variable
-    LinkedList<String> inputMsg;
-    LinkedList<String> outputMsg;
-    boolean login = true;
-    
+    private LinkedList<String> inputMsg;
+    private LinkedList<String> outputMsg;
+    private LinkedList<Observer> observers;
+    private boolean login;
+    private static Datapool datapool;
     
     // constructor
-
+    private Datapool(){
+	    this.login = false;
+	    this.inputMsg = new LinkedList<String>();
+	    this.outputMsg = new LinkedList<String>();
+	    
+    }
     // setter
 
+    public void setInputMsg(String msg){
+	    inputMsg.add(msg)
+    }
+
+    public void setOutputMsg(String msg){
+	
+	    outputMsg.add(msg);
+
+    }
     // getter
+
+    public Datapool getDatapool(){
+       if(Datapool.datapool != null){
+	       Datapool.datapool = new Datapool();
+       }
+
+       return Datapool.datapool;
+    }
+    // method
+    @Override
+	public void attach(DataObserver o){
+        observers.add(o);
+    };
+    
+    @Override
+    public void detach(DataObserver o){};
+        observers.delete(o);
+    @Override
+	public void notifyObservers(){
+
+    }
+
+    public void update(){
+	
+    }
+
 }
 // 
 // Datapool.java ends here
