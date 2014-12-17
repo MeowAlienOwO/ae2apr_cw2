@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 4
+//     Update #: 15
 // 
 
 // Code:
@@ -29,13 +29,19 @@ package stock;
 
 
 import java.io.*;
+import java.util.*;
 class Reader {
 
 
     // variables
 
-    private InputStream is;
-    private Datapool datapool;
+    private BufferedReader br;
+    
+    // constructor
+    Reader(InputStream is){	
+	br = new BufferedReader(new InputStreamReader(is));
+    }
+    
 
     // setter
     
@@ -44,12 +50,20 @@ class Reader {
 
     // methods
 
-    
-    public void run(){
+    public LinkedList<String> read(){
+	
 
+	LinkedList<String> res;
+	String line;
+	while((line = br.readLine()) != null){
+	    res.add(line);
+	}
+	return res;
+    }
+
+    public String readLine(){
 	
     }
-    
 
 }
 // 

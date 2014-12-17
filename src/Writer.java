@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 23
+//     Update #: 29
 // 
 
 // Code:
@@ -33,29 +33,24 @@ class Writer{
 
     // variables
     
-    OutputStream os;
-    Datapool datapool;
+    
+    OutputStreamWriter osw;
+    // Datapool datapool;
     
     // constructor
+    Writer(OutputStream os){
+	osw = new OutputStreamWriter(os);
+    }
+    // setter 
     
-    // setter
-
     // getter
 
     // method
-
-    // public void run(){
+    public void write(String msg){
+	osw.write(msg);
+	osw.flush();
 	
-    // 	while(running){
-    // 	    if(hasOutputMsg()){
-    // 		writeMsg(msg);
-    // 	    }
-    // 	}
-
-    // 	end();
-
-    // }
-
+    }
 
 }
 
