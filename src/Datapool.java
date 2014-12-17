@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 29
+//     Update #: 42
 // 
 
 // Code:
@@ -30,26 +30,28 @@ class Datapool implements DataObservable{
     // variable
     private LinkedList<String> inputMsg;
     private LinkedList<String> outputMsg;
-    private LinkedList<Observer> observers;
-    private boolean login;
+    private LinkedList<DataObserver> observers;
+    private LoginInfor loginInfor;
+    private LinkedList<TradeInfor> tradeInforList;
+    
     private static Datapool datapool;
     
     // constructor
     private Datapool(){
-	    this.login = false;
+	    this.loginInfor = null;
 	    this.inputMsg = new LinkedList<String>();
 	    this.outputMsg = new LinkedList<String>();
-	    
+
     }
     // setter
 
     public void setInputMsg(String msg){
-	    inputMsg.add(msg)
+	inputMsg.add(msg)
     }
 
     public void setOutputMsg(String msg){
 	
-	    outputMsg.add(msg);
+        outputMsg.add(msg);
 
     }
     // getter
@@ -58,20 +60,32 @@ class Datapool implements DataObservable{
        if(Datapool.datapool != null){
 	       Datapool.datapool = new Datapool();
        }
-
        return Datapool.datapool;
     }
+
+
     // method
     @Override
-	public void attach(DataObserver o){
+    public void attach(DataObserver o){
         observers.add(o);
     };
     
     @Override
-    public void detach(DataObserver o){};
-        observers.delete(o);
+    public void detach(DataObserver o){
+	observers.delete(o);
+    };
+
     @Override
-	public void notifyObservers(){
+    public void notifyObservers(){
+	if(isChanged()){
+	    
+	}
+    }
+
+    public void work(){
+	
+	
+
 
     }
 
