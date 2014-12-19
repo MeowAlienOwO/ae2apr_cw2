@@ -1,6 +1,6 @@
 //                              -*- Mode: Java -*- 
-// Trade.java --- 
-// Filename: Trade.java
+// DataObserver.java --- 
+// Filename: DataObserver.java
 // Description: 
 // Author: Zhang Huayan
 // ID number: 6511043
@@ -16,12 +16,16 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 1
+//     Update #: 3
 // 
 
 // Code:
+package stock;
+interface DataObserver{
 
+    public void update();
+}
 
 
 // 
-// Trade.java ends here
+// DataObserver.java ends here
