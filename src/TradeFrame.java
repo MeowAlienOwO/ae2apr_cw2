@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 39
+//     Update #: 55
 // 
 
 // Code:
@@ -36,10 +36,12 @@ class TradeFrame{
     private JTextField company, volume, price;
     private JLabel companyLabel, volumeLabel, priceLabel;
     private JButton ok, cancel;
+    private Datapool datapool;
 
-    TradeFrame(String type){
+    TradeFrame(String type, Datapool datapool){
 	try {
 	    setType(type);
+	    this.datapool = datapool;
 	}
 	catch (Throwable e) {
 	    System.out.println("Error " + e.getMessage());
@@ -74,7 +76,28 @@ class TradeFrame{
 		}
 	    });
 
+	ok.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+		    try {
 
+			String companyText = company.getText();
+			String volumeText  = volume.getText();
+			String priceText   = price.getText();
+			
+			datapool.setCommands(Datapool.CreateTrade(
+					    type,
+					    companyText,
+					    volumeText,
+					    priceText ));
+			frame.dispose();
+		    }
+		    catch (NullPointerException npe) {
+			System.out.println("Error " + npe.getMessage());
+			npe.printStackTrace();
+		    }
+
+		}
+	    });
 
 	this.panel = new JPanel(new GridLayout(4, 1));
 	panel.add(companyPanel);

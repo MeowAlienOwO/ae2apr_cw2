@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 15
+//     Update #: 52
 // 
 
 // Code:
@@ -36,10 +36,11 @@ class Reader {
     // variables
 
     private BufferedReader br;
-    
+    private Datapool datapool;
     // constructor
-    Reader(InputStream is){	
+    Reader(InputStream is, Datapool datapool){	
 	br = new BufferedReader(new InputStreamReader(is));
+	this.datapool = datapool;
     }
     
 
@@ -50,21 +51,73 @@ class Reader {
 
     // methods
 
-    public LinkedList<String> read(){
+    public String readFeedback() throws ServerErrorException, IOException{
+	String line;
+
+	    while((line = br.readLine()) != null){
+		String[] splited = line.split(" ");
+		if(isError(splited[0]))
+		    throw new ServerErrorException(splited[1]);
+
+		else if(isFeedback(splited[0])) break;
+	    
+		else if(isServerMsg(splited[0])){
+		    datapool.setServerInfor(line);
+		}
+
+	    }
 	
 
-	LinkedList<String> res;
-	String line;
-	while((line = br.readLine()) != null){
-	    res.add(line);
-	}
-	return res;
+	    return line;
     }
 
-    public String readLine(){
-	
+    public List<String> readBook() throws ServerErrorException, IOException{
+	LinkedList<String> books = new LinkedList<String>();
+
+	String line;
+
+	while((line = br.readLine()) != null){
+	    String[] splited = line.split(" ");
+	    if(isError(splited[0]))
+		throw new ServerErrorException(splited[1]);
+
+	    if(splited[0].equals(Datapool.BOOK))
+		books.add(line);
+	}
+
+	return books;
+    }
+
+    public boolean isError(String input){
+	return input.equals(Datapool.ERROR);
+    }
+
+    public boolean isServerMsg(String input){
+	return input.equals(Datapool.TICK)
+	    || input.equals(Datapool.EXEC);
+    }
+
+    public boolean isFeedback(String input){
+	return input.equals(Datapool.CONFIRM);
     }
 
 }
+
+class ServerErrorException extends Exception {
+    public ServerErrorException() {
+	super();
+    }
+    public ServerErrorException(String msg) {
+	super(msg);
+    }
+    public ServerErrorException(String msg, Throwable cause) {
+	super(msg, cause);
+    }
+    public ServerErrorException(Throwable cause) {
+	super(cause);
+    }
+
+}
+
 // 
 // Reader.java ends here

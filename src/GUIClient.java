@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 36
+//     Update #: 40
 // 
 
 // Code:
@@ -57,18 +57,20 @@ public class GUIClient{
     private boolean running = true;
     private int port = 1234;
     private MainFrame mainframe;
-    private Datapool Datapool;
+    private Datapool datapool;
     // methods
     private void initialize(){
+
+	datapool = Datapool.getDatapool();
 	
-	mainframe = MainFrame.getMainFrame();
+	mainframe = MainFrame.getMainFrame(datapool);
 		
     }
 
     private void update(){
 	// datapool.update();
 	
-	gui.update();
+	// .update();
 	
     }
 

@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 29
+//     Update #: 30
 // 
 
 // Code:
@@ -46,7 +46,7 @@ class Writer{
     // getter
 
     // method
-    public void write(String msg){
+    public void write(String msg) throws IOException{
 	osw.write(msg);
 	osw.flush();
 	

@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-n//     Update #: 74
+//     Update #: 102
 // 
 
 // Code:
@@ -82,17 +82,55 @@ class LoginFrame{
 		}
 	    });
 
-	ok.addActionListener(new ActionListener(){
+	login.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
 
-		    try{
-			data
+		    try {
+			String usrnameText = usrname.getText();
+			String passwdText = new String(passwd.getPassword()); 
+			
+			String[] splited = server.getText().split(":");
+			if(splited.length != 2)
+			    throw new IllegalArgumentException("illegal input");
+			    
+			String portText = splited[1];
+			String hostText = splited[0];
 
-		    }catch(Expection e){
 
+
+			datapool.setCommands(Datapool.CreateLogin(
+					     portText,
+					     hostText,
+					     usrnameText,
+					     passwdText));
+			frame.dispose();
 		    }
+		    catch (NullPointerException npe) {
+			System.out.println(npe.getMessage());
+			
+		    }catch (IllegalArgumentException iae){
+			iae.printStackTrace();
+		    }
+
 		}
 	    });
+    }
+
+}
+
+
+class IllegalArgumentException extends Exception {
+    public IllegalArgumentException() {
+	super();
+    }
+    public IllegalArgumentException(String msg) {
+	super(msg);
+    }
+    public IllegalArgumentException(String msg, Throwable cause) {
+	super(msg, cause);
+    }
+    public IllegalArgumentException(Throwable cause) {
+	super(cause);
     }
 
 }
