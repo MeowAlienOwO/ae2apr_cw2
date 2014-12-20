@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 55
+//     Update #: 57
 // 
 
 // Code:
@@ -39,14 +39,10 @@ class TradeFrame{
     private Datapool datapool;
 
     TradeFrame(String type, Datapool datapool){
-	try {
-	    setType(type);
-	    this.datapool = datapool;
-	}
-	catch (Throwable e) {
-	    System.out.println("Error " + e.getMessage());
-	    e.printStackTrace();
-	}
+
+	setType(type);
+	this.datapool = datapool;
+
 	
 	this.company = new JTextField(20);
 	this.volume  = new JTextField(20);

@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 248
+//     Update #: 299
 // 
 
 // Code:
@@ -32,15 +32,17 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
 import java.util.*;
+import java.io.*;
+
 class MainFrame implements DataObserver{
-    public static final String[] COLUMN_NAME = {"ID", "Type", "Company", "Volume", "Price"};
+    private static final String[] COLUMN_NAME = {"ID", "Type", "Company", "Volume", "Price"};
     // variables
     private static MainFrame mainframe = null;
     private JFrame frame;
     private JPanel panel;
     private Datapool datapool;
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 600;
+    public static final int WIDTH = 1024;
+    public static final int HEIGHT = 768;
 
     // left side:
     private JPanel left;
@@ -116,6 +118,15 @@ class MainFrame implements DataObserver{
 		}
 	    });
 
+	logout.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+		    try{
+		    datapool.logOut();
+		    }catch(IOException ioe){
+			JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+		}
+	    });
 
 
 	// right:
@@ -153,6 +164,13 @@ class MainFrame implements DataObserver{
 	operation.add(refresh);
 	operation.add(cancel);
 	// book.setEditable(false);
+	// Vector title = new Vector(Arrays.asList(MainFrame.COLUMN_NAME));
+	// tableModel.setDataVector(datapool.getBooks().toArray(), MainFrame.COLUMN_NAME);
+	System.out.println("tableModel:"+ tableModel.toString());
+	// System.out.println("getBook:"+datapool.getBooks().toString());
+	// system.out.println("getbook:" + (datapool.getBooks() == null));
+	System.out.println("datapool:" +(datapool == null));
+	tableModel.setDataVector(datapool.getBooks(), MainFrame.COLUMN_NAME);
 	bottomRight.add("Center", new JScrollPane(book));
 	bottomRight.add("South", operation);
 	
@@ -164,8 +182,13 @@ class MainFrame implements DataObserver{
 
 	cancel.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
-		    int id = (int)book.getSelectedRows()[0];
-		    datapool.setCommands(Datapool.CreateCancel(id));
+
+		    int choice = JOptionPane.showConfirmDialog(null, ("Are you going to cancel book No." + book.getSelectedRows()[0]), "Cancel", JOptionPane.YES_NO_OPTION);
+		    if(choice == 0){
+
+			int id = (int)book.getSelectedRows()[0];
+			datapool.setCommands(Datapool.CreateCancel(id));
+		    }
 		}
 	    });
 	
@@ -193,6 +216,12 @@ class MainFrame implements DataObserver{
     
     @Override
     public void update(){
+	// check error
+	LinkedList<Exception> errorList = datapool.getError();
+	Exception e;
+	while((e = errorList.poll()) != null){
+	    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	}
 	
 	// update tickmsg
 	LinkedList<String> serverInfor = datapool.getServerInfor();
@@ -205,24 +234,27 @@ class MainFrame implements DataObserver{
 		tickmsg.append(infor + "<<<<<<<<<<\n");
 	    }
 	}
+
 	// update book table
-	LinkedList<TradeInfor> tradeInfor = datapool.getTradeInfor();
+	// tableModel.setDataVector(datapool.getBooks());
+	book.repaint();
+	// LinkedList<TradeInfor> tradeInfor = datapool.getTradeInfor();
 
-	for(int i = tableModel.getRowCount() - 1; i >= 0; i--){
-	    tableModel.removeRow(i);
-	}
+	// for(int i = tableModel.getRowCount() - 1; i >= 0; i--){
+	//     tableModel.removeRow(i);
+	// }
 
-	for(int i = 0; i < tradeInfor.size(); i++){
-	    Object[] rowData = {
-		tradeInfor.get(i).getID(),
-		tradeInfor.get(i).getType(),
-		tradeInfor.get(i).getCompany(),
-		tradeInfor.get(i).getVolume(),
-		tradeInfor.get(i).getPrice()
-	    };
+	// for(int i = 0; i < tradeInfor.size(); i++){
+	//     Object[] rowData = {
+	// 	tradeInfor.get(i).getID(),
+	// 	tradeInfor.get(i).getType(),
+	// 	tradeInfor.get(i).getCompany(),
+	// 	tradeInfor.get(i).getVolume(),
+	// 	tradeInfor.get(i).getPrice()
+	//     };
 	    
-	    tableModel.addRow(rowData);
-	}
+	//     tableModel.addRow(rowData);
+	// }
 	
     }
 

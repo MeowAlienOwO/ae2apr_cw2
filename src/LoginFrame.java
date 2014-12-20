@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 102
+//     Update #: 126
 // 
 
 // Code:
@@ -27,7 +27,7 @@ package stock;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-
+import java.net.*;
 class LoginFrame{
     
     private JFrame frame;
@@ -86,31 +86,48 @@ class LoginFrame{
 		public void actionPerformed(ActionEvent e){
 
 		    try {
+			System.out.println("click login button");
 			String usrnameText = usrname.getText();
 			String passwdText = new String(passwd.getPassword()); 
 			
 			String[] splited = server.getText().split(":");
-			if(splited.length != 2)
-			    throw new IllegalArgumentException("illegal input");
+			if(splited.length != 2
+			   || usrnameText == null
+			   || passwdText  == null)
+			    throw new IllegalArgumentException("Illegal input!");
 			    
 			String portText = splited[1];
 			String hostText = splited[0];
 
+			datapool.logIn(new LoginInfor(
+						      Integer.parseInt(portText),
+						      hostText,
+						      usrnameText,
+						      passwdText
+						      ));
 
-
-			datapool.setCommands(Datapool.CreateLogin(
-					     portText,
-					     hostText,
-					     usrnameText,
-					     passwdText));
+			// datapool.setCommands(Datapool.CreateLogin(
+			// 					  portText,
+			// 					  hostText,
+			// 					  usrnameText,
+			// 					  passwdText));
 			frame.dispose();
+		    }catch(Exception ex){
+			JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);			
 		    }
-		    catch (NullPointerException npe) {
-			System.out.println(npe.getMessage());
+		    // }catch (IllegalArgumentException iae){
+		    // 	// iae.printStackTrace();
+		    // 	JOptionPane.showMessageDialog(null, iae.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+		    // }catch(ServerErrorException see){
+		    // 	JOptionPane.showMessageDialog(null, see.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			
-		    }catch (IllegalArgumentException iae){
-			iae.printStackTrace();
-		    }
+		    // }catch(UnknownHostException uhe){
+		    // 	JOptionPane.showMessageDialog(null, uhe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		
+		    // }catch(IOException ioe){
+		    // 	JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		    // }
 
 		}
 	    });

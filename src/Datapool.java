@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 199
+//     Update #: 284
 // 
 
 // Code:
@@ -56,7 +56,7 @@ class Datapool implements DataObservable{
     public static final String TICK   = "TICK";
     public static final String EXEC   = "EXEC";
     public static final String CONFIRM = "OK";
-
+    public static final int    PROTOCAL_VERSION = 1;
     public static String CreateBOOK(){
 	return (Datapool.BOOK + "\n");
     }
@@ -76,8 +76,10 @@ class Datapool implements DataObservable{
     // variable
     private LinkedList<String> serverInfor;
     private LinkedList<String> commands;
-    private LinkedList<TradeInfor> tradeInforList;
+    // private LinkedList<TradeInfor> tradeInforList;
+    private Vector<Vector<String>> books;
     private LinkedList<DataObserver> observers;
+    private LinkedList<Exception> errorList;
     private LoginInfor loginInfor;
     private Socket socket;
     private Reader reader;
@@ -90,7 +92,9 @@ class Datapool implements DataObservable{
 	    this.loginInfor = null;
 	    this.serverInfor   = new LinkedList<String>();
 	    this.commands  = new LinkedList<String>();
+	    this.errorList = new LinkedList<Exception>();
 	    this.observers  = new LinkedList<DataObserver>();
+	    this.books     = new Vector<Vector<String>>();
     }
     // setter
 
@@ -99,18 +103,30 @@ class Datapool implements DataObservable{
     }
 
     public void setCommands(String msg){
-        commands.add(msg);
+
+	commands.add(msg);
     }
 
     public void setLoginInfor(LoginInfor infor){
 	this.loginInfor = infor;
     }
 
+    public void setBooks(LinkedList<String> inputBooks){
+	books.clear();
+	for(int i = 0; i < inputBooks.size(); i++){
+	    String[] splited = inputBooks.get(i).split(" ");
+	    Vector<String> book = new Vector<String>();
+	    for(int j = 1; j < book.size(); j++){
+		book.add(splited[j]);
+	    }
+	    books.add(book);
+	}
+    }
    
     // getter
 
     public static Datapool getDatapool(){
-       if(Datapool.datapool != null){
+       if(Datapool.datapool == null){
 	   Datapool.datapool = new Datapool();
        }
        return Datapool.datapool;
@@ -119,21 +135,38 @@ class Datapool implements DataObservable{
     public LinkedList<String> getServerInfor(){
 	return serverInfor;
     }
+    // public Vector<Vector<String>> getBooks(){
+    // 	return this.books;
+    // }
 
-    public LinkedList<TradeInfor> getTradeInfor(){
-	return tradeInforList;
+    public String[][] getBooks(){
+    	String[][] ret = new String[books.size()][5];
+	for(int i = 0; i < books.size(); i++){
+	    ret[i] = (String[])books.get(i).toArray();
+	}
+
+	return ret;
+    }
+    // public LinkedList<TradeInfor> getTradeInfor(){
+    // 	return tradeInforList;
+    // }
+    public LinkedList<String> getCommands(){
+	return commands;
+    }
+    public LinkedList<Exception> getError(){
+	return errorList;
     }
 
     // method
     @Override
     public void attach(DataObserver o){
         observers.add(o);
-    };
+    }
     
     @Override
     public void detach(DataObserver o){
 	observers.remove(o);
-    };
+    }
 
     @Override
     public void notifyObservers(){
@@ -144,147 +177,151 @@ class Datapool implements DataObservable{
 
     public void work(){
 	while(true){
-	    try {
-		synchronized(commands){
-		    if(!commands.isEmpty()) executeCommands();
-		}
-	    }catch (ServerErrorException see) {
-		
-	    }catch (UnknownHostException uhe){
-
-	    }catch (IOException ioe){
-
-	    }
-	    
-	    notifyObservers();
+	    // refresh();
+	    // if(isChanged())
+		notifyObservers();
 	    
 	}
 	
     }
 
+    public void addException(Exception e){
+	errorList.add(e);
+    }
+    // public boolean isChanged(){
+    // 	return (!serverInfor.isEmpty()
+    // 		|| errorList.isEmpty()
+    // 		);
+    // }
 
-    public void executeCommands() throws ServerErrorException, UnknownHostException, IOException {
+    // public void executeCommands() throws ServerErrorException, UnknownHostException, IOException {
 	
-	String command;
-	while((command = commands.poll()) != null){
+    // 	String command;
+    // 	while((command = commands.poll()) != null){
 
-	    String[] splited = command.split(" ");
+    // 	    String[] splited = command.split(" ");
 	    
-	    // login
-	    if(splited[0].equals(Datapool.LOGIN)){
-		// login infor has a special format,
-		// for it need to store the host information.
-		// this command should be created by Datapool's
-		// static methods.
-		logIn(new LoginInfor(Integer.parseInt(splited[1]),
-				     splited[2],
-				     splited[3],
-				     splited[4]));
-	    }
-	    // logout
-	    if(splited[0].equals(Datapool.LOGOUT)){
-		logOut();
-	    }
+    // 	    // login
+    // 	    if(splited[0].equals(Datapool.LOGIN)){
+    // 		// login infor has a special format,
+    // 		// for it need to store the host information.
+    // 		// this command should be created by Datapool's
+    // 		// static methods.
+    // 		logIn(new LoginInfor(Integer.parseInt(splited[1]),
+    // 				     splited[2],
+    // 				     splited[3],
+    // 				     splited[4]));
+    // 	    }
+    // 	    // logout
+    // 	    if(splited[0].equals(Datapool.LOGOUT)){
+    // 		logOut();
+    // 	    }
 
-	    // trade
-	    if(splited[0].equals(Datapool.ASK) ||
-	       splited[0].equals(Datapool.BID)){
-		writer.write(command);
-		String id = confirm();
-		tradeInforList.add(new TradeInfor(
-						  splited[0],
-						  splited[1],
-						  splited[2],
-						  splited[3],
-						  id ));
-	    }
+    // 	    // trade
+    // 	    if(splited[0].equals(Datapool.ASK) ||
+    // 	       splited[0].equals(Datapool.BID)){
+    // 		writer.write(command);
+    // 		refresh();
+
+    // 	    }
 		    
-	    // cancel
-	    if(splited[0].equals(Datapool.CANCEL)){
-		writer.write(command);
-		confirm();
-		refresh();
-		// deleteTrade(Integer.parseInt(splited[1]));
-	    }
+    // 	    // cancel
+    // 	    if(splited[0].equals(Datapool.CANCEL)){
+    // 		writer.write(command);
+    // 		confirm();
+    // 		refresh();
+    // 		// deleteTrade(Integer.parseInt(splited[1]));
+    // 	    }
 
-	    // book
-	    if(splited[0].equals(Datapool.BOOK)){
-		refresh();
-	    }
-	}
+    // 	    // book
+    // 	    if(splited[0].equals(Datapool.BOOK)){
+    // 		refresh();
+    // 	    }
+    // 	}
        
-    }
+    // }
     
     public void logIn(LoginInfor infor) throws ServerErrorException, UnknownHostException, IOException{
 	
-
-	    setLoginInfor(infor);
-	    this.socket = new Socket(infor.getHost(), infor.getPort());
-	    this.reader = new Reader(socket.getInputStream(), this);
-	    this.writer = new Writer(socket.getOutputStream());
-	    writer.write(infor.toString());
-	    confirm();
+	    // setLoginInfor(infor);
+	System.out.println("log in start");
+	this.socket = new Socket(infor.getHost(), infor.getPort());
+	this.reader = new Reader(socket.getInputStream(), this);
+	this.writer = new Writer(socket.getOutputStream(), this);
+	System.out.println("login infor:" + infor.toString());
+	writer.write(infor.toString());
+	Thread readerThread = new Thread(reader);
+	Thread writerThread = new Thread(writer);
 	
+	readerThread.start();
+	writerThread.start();
+	// writer.write(infor.toString());
+	    
+	// confirm();
+	    
     }
 
     public void logOut() throws IOException{
-	setLoginInfor(null);
+	// setLoginInfor(null);
 
 	writer.write("LOGOUT\n");
-	this.reader = null;
-	this.writer = null;
 	socket.close();
 	
     }
     
-    public void deleteTrade(int id) {
-	Iterator<TradeInfor> itr = tradeInforList.iterator();
+    // public void deleteTrade(int id) {
+    // 	Iterator<TradeInfor> itr = tradeInforList.iterator();
 
-	while(itr.hasNext()){
-	    if(itr.next().getID() == id){
-		itr.remove();
-		break;
-	    }
-	}
-    }
+    // 	while(itr.hasNext()){
+    // 	    if(itr.next().getID() == id){
+    // 		itr.remove();
+    // 		break;
+    // 	    }
+    // 	}
+    // }
 
-    public void refresh() throws ServerErrorException, IOException{
+    // public void refresh() throws ServerErrorException, IOException{
 
 	
-	writer.write(Datapool.BOOK + "\n");
-	List<String> books = reader.readBook();
-	// BOOK return format:
-	// BOOK id company volume price type\n
-	if(!books.isEmpty()){
-	    tradeInforList = new LinkedList<TradeInfor>();
-	    Iterator<String> itr = books.iterator();
-	    while(itr.hasNext()){
-		String[] splited = itr.next().split(" ");
-		tradeInforList.add(new TradeInfor(
-				  splited[5], // type
-				  splited[2], // company
-				  splited[3], // volume
-				  splited[4], // price
-				  splited[1]  // id
-						  ));
-	    }
+
+	
+	// writer.write(Datapool.cBOOK + "\n");
+	// List<String> books = reader.readBook();
+	// // BOOK return format:
+	// // BOOK id company volume price type\n
+	// if(!books.isEmpty()){
+	//     tradeInforList = new LinkedList<TradeInfor>();
+	//     Iterator<String> itr = books.iterator();
+	//     while(itr.hasNext()){
+	// 	String[] splited = itr.next().split(" ");
+	// 	tradeInforList.add(new TradeInfor(
+	// 			  splited[5], // type
+	// 			  splited[2], // company
+	// 			  splited[3], // volume
+	// 			  splited[4], // price
+	// 			  splited[1]  // id
+	// 					  ));
+	//     }
 
 	  
-	}
+	// }
 	
-    }
+    // }
 
-    public String confirm() throws ServerErrorException, IOException{
+    // public String confirm() throws ServerErrorException, IOException{
 
-	String[] splited = reader.readFeedback().split(" ");
+    // 	String[] splited = reader.readFeedback().split(" ");
 	
-	return splited.length > 1? splited[0] : splited[1];
+    // 	return splited.length > 1? splited[0] : splited[1];
 
-    }
+    // }
 
 
     public boolean isLoggedIn(){
-	return loginInfor != null;
+
+	assert socket != null;
+	
+	return socket.isClosed();
     }
 
 }

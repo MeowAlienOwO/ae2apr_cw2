@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 52
+//     Update #: 92
 // 
 
 // Code:
@@ -30,7 +30,7 @@ package stock;
 
 import java.io.*;
 import java.util.*;
-class Reader {
+class Reader implements Runnable{
 
 
     // variables
@@ -88,6 +88,49 @@ class Reader {
 	return books;
     }
 
+
+    @Override
+    public void run(){
+	
+	while(datapool.isLoggedIn()){
+	    String line;
+
+	    try{
+		while((line = br.readLine()) != null){
+		    System.out.println(line);
+		    String[] splited = line.split(" ");
+
+		    if(isError(splited[0]))
+			throw new ServerErrorException(splited[1]);
+		    if(isFeedback(splited[0])) 
+			continue;
+		    if(isServerMsg(splited[0])){
+			datapool.setServerInfor(line);
+		    }
+
+		    if(isBook(splited[0])){
+			LinkedList<String> books = new LinkedList<String>();
+			books.add(line);
+			while((line = br.readLine()) != null
+			      && !isBook(line.split(" ")[0])){
+			    // assume the feedback of book is not been separated
+			    // by other command.
+			    books.add(line);
+			}
+
+			datapool.setBooks(books);
+		    }
+
+		}		
+	    }catch(ServerErrorException see){
+		datapool.addException(see);
+	    }catch(IOException ioe){
+		datapool.addException(ioe);
+	    }
+
+	}
+    }
+
     public boolean isError(String input){
 	return input.equals(Datapool.ERROR);
     }
@@ -99,6 +142,10 @@ class Reader {
 
     public boolean isFeedback(String input){
 	return input.equals(Datapool.CONFIRM);
+    }
+
+    public boolean isBook(String input){
+	return input.equals(Datapool.BOOK);
     }
 
 }

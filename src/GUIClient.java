@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 40
+//     Update #: 50
 // 
 
 // Code:
@@ -28,7 +28,7 @@
 
 package stock;
 
-
+import java.util.*;
 public class GUIClient{
 
     public static void main(String[] args){
@@ -63,21 +63,11 @@ public class GUIClient{
 
 	datapool = Datapool.getDatapool();
 	
+	
+
 	mainframe = MainFrame.getMainFrame(datapool);
 		
     }
-
-    private void update(){
-	// datapool.update();
-	
-	// .update();
-	
-    }
-
-    private boolean running(){
-	return true;
-    }
-
 
 }
 // 

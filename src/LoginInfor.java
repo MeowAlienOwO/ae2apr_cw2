@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 16
+//     Update #: 17
 // 
 
 // Code:
@@ -78,6 +78,7 @@ class LoginInfor{
     @Override
     public String toString(){
 	return ( Datapool.LOGIN + " "
+		 + Datapool.PROTOCAL_VERSION + " "
 	       + usrname        + " "
 	       + passwd         + "\n");
     }
