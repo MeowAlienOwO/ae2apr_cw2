@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 299
+//     Update #: 464
 // 
 
 // Code:
@@ -33,7 +33,7 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
-
+import java.net.SocketException;
 class MainFrame implements DataObserver{
     private static final String[] COLUMN_NAME = {"ID", "Type", "Company", "Volume", "Price"};
     // variables
@@ -74,16 +74,145 @@ class MainFrame implements DataObserver{
     // constructor
     private MainFrame(Datapool datapool){
     
-	this.frame = new JFrame("MainFrame Client");
+	this.frame = new JFrame("GUI Client");
 	this.panel = new JPanel(new BorderLayout());
 	this.datapool = datapool;
-
-
-
 
 	frame.setSize(MainFrame.WIDTH, MainFrame.HEIGHT);
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	// left side:
+	// this.left   = new JPanel(new BorderLayout(5, 0));
+	// this.account = new JPanel(new BorderLayout());
+	// this.login  = new JButton("Log in");
+	// this.logout = new JButton("Log out");
+	// this.trade  = new JPanel(new GridLayout(2, 1));
+	// this.ask    = new JButton("ASK");
+	// this.bid    = new JButton("BID");
+	
+	// account.add("Center", login);
+	// account.add("South", logout);
+	// trade.add(ask);
+	// trade.add(bid);
+	// left.add("North", account);
+	// left.add("Center", trade);
+	// left.setSize(200, MainFrame.HEIGHT);
+	// login.addActionListener(new ActionListener(){
+	// 	public void actionPerformed(ActionEvent e){
+	// 	    LoginFrame lf = new LoginFrame(MainFrame.mainframe, datapool);
+		    
+	// 	}
+	//     });
+
+	// logout.addActionListener(new ActionListener(){
+	// 	public void actionPerformed(ActionEvent e){
+	// 	    try{
+	// 	    datapool.logOut();
+	// 	    }catch(IOException ioe){
+	// 		JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	// 	    }
+	// 	}
+	//     });
+
+	// ask.addActionListener(new ActionListener(){
+	// 	public void actionPerformed(ActionEvent e){
+	// 	    TradeFrame ask = new TradeFrame("ASK", datapool);
+	// 	}
+	//     });
+	// bid.addActionListener(new ActionListener(){
+	// 	public void actionPerformed(ActionEvent e){
+		    
+	// 	    TradeFrame bid = new TradeFrame("BID", datapool);
+
+	// 	}
+	//     });
+
+
+
+	// // right:
+	// this.right = new JPanel(new GridLayout(2, 1));
+	// // top-right:
+	// this.topRight    = new JPanel(new BorderLayout());
+	// this.tickmsg     = new JTextArea();
+	// this.tickborder = new TitledBorder("Stock Ticker");
+	
+	// tickScrollPane = new JScrollPane(tickmsg);
+	// tickScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+	// topRight.add("Center", tickScrollPane);
+	
+	// topRight.setBorder(tickborder);
+	// tickmsg.setEditable(false);
+
+	// // bottom-right:
+	
+	// this.tableModel = new DefaultTableModel(MainFrame.COLUMN_NAME, 0){
+	// 	// Override the isCellEditable method to make every cell 
+	// 	// not editable
+	// 	public boolean isCellEditable(int row, int column){
+	// 	    return false;
+	// 	}
+	//     };
+
+	// this.bottomRight = new JPanel(new BorderLayout());
+	// this.bookBorder  = new TitledBorder("Your Offer Book");
+	// this.book        = new JTable(tableModel);
+	// this.operation   = new JPanel(new GridLayout(1, 2));
+	// this.refresh     = new JButton("Refresh");
+	// this.cancel      = new JButton("Cancel...");
+
+	// bottomRight.setBorder(bookBorder);
+	// operation.add(refresh);
+	// operation.add(cancel);
+
+	// tableModel.setDataVector(datapool.getBooks(), 
+	// 			 new Vector(Arrays.asList(MainFrame.COLUMN_NAME)));
+	// bottomRight.add("Center", new JScrollPane(book));
+	// bottomRight.add("South", operation);
+	
+	// refresh.addActionListener(new ActionListener(){
+	// 	public void actionPerformed(ActionEvent e){
+	// 	    datapool.setCommands(Datapool.CreateBOOK());
+	// 	    tableModel.fireTableDataChanged();
+	// 	    datapool.setBookChanged(false);
+	// 	}
+	//     });
+
+	// cancel.addActionListener(new ActionListener(){
+	// 	public void actionPerformed(ActionEvent e){
+
+	// 	    int selectedRow = book.getSelectedRow();
+		    
+
+	// 	    if (selectedRow == -1) {
+	// 		JOptionPane.showMessageDialog(null, "You didn't select!", "Error", JOptionPane.ERROR_MESSAGE);
+	// 	    }else{
+	// 		String id = (String)tableModel.getValueAt(selectedRow, 0);
+	// 		int choice = JOptionPane.showConfirmDialog(null, ("Are you going to cancel book No." + id), "Cancel", JOptionPane.YES_NO_OPTION);
+		    
+	// 		if(choice == 0){
+
+			    
+	// 		    datapool.setCommands(Datapool.CreateCancel(id));
+	// 		}
+	// 	    }
+	// 	}
+
+	//     });
+
+	// right.add("Center", topRight);
+	// right.add("South", bottomRight);
+	// panel.add("West", left);
+	// panel.add("Center", right);
+
+	setLeft();
+	setRight();
+	setAction();
+	frame.add(panel);
+	frame.setVisible(true);	
+	
+    }
+    // setter
+
+    private void setLeft(){
 	this.left   = new JPanel(new BorderLayout(5, 0));
 	this.account = new JPanel(new BorderLayout());
 	this.login  = new JButton("Log in");
@@ -99,37 +228,11 @@ class MainFrame implements DataObserver{
 	left.add("North", account);
 	left.add("Center", trade);
 	left.setSize(200, MainFrame.HEIGHT);
-	login.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e){
-		    LoginFrame lf = new LoginFrame(datapool);
-		}
-	    });
 
-	ask.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e){
-		    TradeFrame ask = new TradeFrame("ASK", datapool);
-		}
-	    });
-	bid.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e){
-		    
-		    TradeFrame bid = new TradeFrame("BID", datapool);
+	panel.add("West", left);	
 
-		}
-	    });
-
-	logout.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e){
-		    try{
-		    datapool.logOut();
-		    }catch(IOException ioe){
-			JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		    }
-		}
-	    });
-
-
-	// right:
+    }
+    private void setRight(){
 	this.right = new JPanel(new GridLayout(2, 1));
 	// top-right:
 	this.topRight    = new JPanel(new BorderLayout());
@@ -144,7 +247,6 @@ class MainFrame implements DataObserver{
 	tickmsg.setEditable(false);
 
 	// bottom-right:
-	
 	this.tableModel = new DefaultTableModel(MainFrame.COLUMN_NAME, 0){
 		// Override the isCellEditable method to make every cell 
 		// not editable
@@ -152,7 +254,6 @@ class MainFrame implements DataObserver{
 		    return false;
 		}
 	    };
-
 	this.bottomRight = new JPanel(new BorderLayout());
 	this.bookBorder  = new TitledBorder("Your Offer Book");
 	this.book        = new JTable(tableModel);
@@ -163,47 +264,103 @@ class MainFrame implements DataObserver{
 	bottomRight.setBorder(bookBorder);
 	operation.add(refresh);
 	operation.add(cancel);
-	// book.setEditable(false);
-	// Vector title = new Vector(Arrays.asList(MainFrame.COLUMN_NAME));
-	// tableModel.setDataVector(datapool.getBooks().toArray(), MainFrame.COLUMN_NAME);
-	System.out.println("tableModel:"+ tableModel.toString());
-	// System.out.println("getBook:"+datapool.getBooks().toString());
-	// system.out.println("getbook:" + (datapool.getBooks() == null));
-	System.out.println("datapool:" +(datapool == null));
-	tableModel.setDataVector(datapool.getBooks(), MainFrame.COLUMN_NAME);
+
+	tableModel.setDataVector(datapool.getBooks(), 
+				 new Vector(Arrays.asList(MainFrame.COLUMN_NAME)));
 	bottomRight.add("Center", new JScrollPane(book));
 	bottomRight.add("South", operation);
-	
+
+
+	right.add("Center", topRight);
+	right.add("South", bottomRight);	
+	panel.add("Center", right);
+    }
+    private void setAction(){
+	// left:
+	login.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+		    LoginFrame lf;
+		    if(!datapool.isLoggedIn())
+			lf = new LoginFrame(MainFrame.mainframe, datapool);
+		}
+	    });
+
+	logout.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+		    if(datapool.isLoggedIn()){
+			try{
+			    datapool.logOut();
+			}catch(IOException ioe){
+			    JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		    }
+		}
+	    });
+
+	ask.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e){
+		    TradeFrame ask;
+		    if(datapool.isLoggedIn())
+			ask = new TradeFrame("ASK", datapool);
+		}
+	    });
+	bid.addActionListener(new ActionListener(){
+		
+		public void actionPerformed(ActionEvent e){
+		    TradeFrame bid;
+		    if(datapool.isLoggedIn())
+			bid = new TradeFrame("BID", datapool);
+
+		}
+	    });
+
+	// right
 	refresh.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
-		    datapool.setCommands(Datapool.CreateBOOK());
+		    if(datapool.isLoggedIn()){
+
+			// tableModel.fireTableDataChanged();
+			// datapool.setBookChanged(false);
+			datapool.refresh();
+		    }
 		}
 	    });
 
 	cancel.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
+		    if(datapool.isLoggedIn()){
+			int[] selectedRows = book.getSelectedRows();
+			String id;
+			int choice;
+			if (selectedRows.length == 0) {
+			    JOptionPane.showMessageDialog(null,
+							  "You didn't select!",
+							  "Error",
+							  JOptionPane.ERROR_MESSAGE);
+			}else if(selectedRows.length == 1){
+			    id = (String)tableModel.getValueAt(selectedRows[0], 0);
+			    choice = JOptionPane.showConfirmDialog(null,
+								   ("Are you going to cancel book No." + id),
+								   "Cancel",
+								   JOptionPane.YES_NO_OPTION);
+			    if(choice == 0){
+				datapool.setCommands(Datapool.CreateCancel(id));
+			    }
 
-		    int choice = JOptionPane.showConfirmDialog(null, ("Are you going to cancel book No." + book.getSelectedRows()[0]), "Cancel", JOptionPane.YES_NO_OPTION);
-		    if(choice == 0){
-
-			int id = (int)book.getSelectedRows()[0];
-			datapool.setCommands(Datapool.CreateCancel(id));
+			}else{
+			    choice = JOptionPane.showConfirmDialog(null, "Are you going to cancel all books seleceted?", "Cancel", JOptionPane.YES_NO_OPTION);
+			    if(choice == 0){
+				for(int i = 0; i < selectedRows.length; i++){
+				    id = (String)tableModel.getValueAt(selectedRows[i], 0);
+				    datapool.setCommands(Datapool.CreateCancel(id));
+				}
+			    }
+			}
 		    }
 		}
+
 	    });
-	
-
-	right.add("Center", topRight);
-	right.add("South", bottomRight);
-	panel.add("West", left);
-	panel.add("Center", right);
-
-	frame.add(panel);
-	frame.setVisible(true);	
-	
     }
-    // setter
-
     // getter
     public static MainFrame getMainFrame(Datapool datapool){
 	if(MainFrame.mainframe == null){
@@ -216,46 +373,61 @@ class MainFrame implements DataObserver{
     
     @Override
     public void update(){
-	// check error
-	LinkedList<Exception> errorList = datapool.getError();
-	Exception e;
-	while((e = errorList.poll()) != null){
-	    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	updateError();
+	updateTickmsg();
+	updateBook();
+
+    }
+
+    private void updateError(){
+	LinkedList<Exception> errorList = datapool.getException();
+	Exception exception;
+	while((exception = errorList.poll()) != null){
+	    try {
+		throw exception;
+	    
+	    }catch(SocketException ioe){
+		JOptionPane.showMessageDialog(null, "Connection Closed.", "Error", JOptionPane.ERROR_MESSAGE);		
+	    }catch(Exception e){
+		JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+
 	}
 	
-	// update tickmsg
+    }
+
+    private void updateTickmsg(){
 	LinkedList<String> serverInfor = datapool.getServerInfor();
 	String infor;
 	while((infor = serverInfor.poll()) != null){
 	    String[] splited = infor.split(" ");
 	    if(splited[0].equals(Datapool.TICK)){
-		tickmsg.append(infor + "\n");
+		String tick = splited[1];
+		for(int i = 2; i < splited.length; i++){
+		    tick.concat(splited[i]).concat(" ");
+		}
+		tickmsg.append(tick + "\n");
 	    } else if(splited[0].equals(Datapool.EXEC)){
-		tickmsg.append(infor + "<<<<<<<<<<\n");
+		String exec = "????";
+		for(int i = 1; i < splited.length; i++){
+		    exec.concat(splited[i]).concat(" ");
+		}
+		tickmsg.append(exec + "<<<<<<<<<<\n");
 	    }
 	}
+	SwingUtilities.invokeLater(new Runnable(){
+		public void run(){
+		    tickmsg.updateUI();
+		}
+	    });
 
-	// update book table
-	// tableModel.setDataVector(datapool.getBooks());
-	book.repaint();
-	// LinkedList<TradeInfor> tradeInfor = datapool.getTradeInfor();
+    }
 
-	// for(int i = tableModel.getRowCount() - 1; i >= 0; i--){
-	//     tableModel.removeRow(i);
-	// }
-
-	// for(int i = 0; i < tradeInfor.size(); i++){
-	//     Object[] rowData = {
-	// 	tradeInfor.get(i).getID(),
-	// 	tradeInfor.get(i).getType(),
-	// 	tradeInfor.get(i).getCompany(),
-	// 	tradeInfor.get(i).getVolume(),
-	// 	tradeInfor.get(i).getPrice()
-	//     };
-	    
-	//     tableModel.addRow(rowData);
-	// }
-	
+    private void updateBook(){
+	tableModel.fireTableDataChanged();
+    }
+    public JTextArea getTickArea(){
+	return tickmsg;
     }
 
 }

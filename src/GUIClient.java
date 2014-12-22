@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 50
+//     Update #: 54
 // 
 
 // Code:
@@ -41,11 +41,8 @@ public class GUIClient{
 
 	GUIClient client = new GUIClient();
 	client.initialize();
+	client.work();
 
-	// while(client.running){
-
-	//     client.update();
-	// }
 
 	}
 	catch (Throwable e) {
@@ -66,7 +63,12 @@ public class GUIClient{
 	
 
 	mainframe = MainFrame.getMainFrame(datapool);
-		
+	
+	datapool.attach(mainframe);
+    }
+
+    public void work(){
+	datapool.work();
     }
 
 }

@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 126
+//     Update #: 145
 // 
 
 // Code:
@@ -37,8 +37,9 @@ class LoginFrame{
     private JPanel panel, serverPanel, usrPanel, passwdPanel, buttonPanel;
     private JButton login, cancel;
     private Datapool datapool;
+    private MainFrame mainframe;
 
-    LoginFrame(Datapool datapool){
+    LoginFrame(MainFrame mainframe, Datapool datapool){
 	this.frame       = new JFrame("Log in");
 	this.server      = new JTextField(10);
 	this.usrname     = new JTextField(10);
@@ -49,7 +50,7 @@ class LoginFrame{
 	this.login       = new JButton("Login");
 	this.cancel      = new JButton("Cancel");
 	this.datapool    = datapool;
-
+	this.mainframe   = mainframe;
 	this.serverPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	serverPanel.add(serverLabel);
 	serverPanel.add(server);
@@ -77,23 +78,20 @@ class LoginFrame{
 
 	cancel.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
-
 		    frame.dispose();
 		}
 	    });
 
 	login.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
-
 		    try {
-			System.out.println("click login button");
 			String usrnameText = usrname.getText();
 			String passwdText = new String(passwd.getPassword()); 
-			
 			String[] splited = server.getText().split(":");
-			if(splited.length != 2
-			   || usrnameText == null
-			   || passwdText  == null)
+
+			if(splited.length          != 2
+			   || usrnameText.length() == 0
+			   || passwdText.length()  == 0)
 			    throw new IllegalArgumentException("Illegal input!");
 			    
 			String portText = splited[1];
@@ -103,32 +101,12 @@ class LoginFrame{
 						      Integer.parseInt(portText),
 						      hostText,
 						      usrnameText,
-						      passwdText
-						      ));
-
-			// datapool.setCommands(Datapool.CreateLogin(
-			// 					  portText,
-			// 					  hostText,
-			// 					  usrnameText,
-			// 					  passwdText));
+						      passwdText));
+			mainframe.getTickArea().setText("");
 			frame.dispose();
 		    }catch(Exception ex){
 			JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);			
 		    }
-		    // }catch (IllegalArgumentException iae){
-		    // 	// iae.printStackTrace();
-		    // 	JOptionPane.showMessageDialog(null, iae.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-		    // }catch(ServerErrorException see){
-		    // 	JOptionPane.showMessageDialog(null, see.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			
-		    // }catch(UnknownHostException uhe){
-		    // 	JOptionPane.showMessageDialog(null, uhe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		
-		    // }catch(IOException ioe){
-		    // 	JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		    // }
-
 		}
 	    });
     }

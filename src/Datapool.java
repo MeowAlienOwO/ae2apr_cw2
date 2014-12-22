@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 284
+//     Update #: 440
 // 
 
 // Code:
@@ -57,12 +57,13 @@ class Datapool implements DataObservable{
     public static final String EXEC   = "EXEC";
     public static final String CONFIRM = "OK";
     public static final int    PROTOCAL_VERSION = 1;
+
     public static String CreateBOOK(){
 	return (Datapool.BOOK + "\n");
     }
 
-    public static String CreateCancel(int id){
-	return (Datapool.CANCEL + " " + String.valueOf(id) + "\n");
+    public static String CreateCancel(String id){
+	return (Datapool.CANCEL + " " + id + "\n");
     }
 
     public static String CreateLogin(String port, String host, String usrname, String passwd){
@@ -72,39 +73,44 @@ class Datapool implements DataObservable{
     public static String CreateTrade(String type, String company, String volume, String price){
 	return (type + " " + company + " " + volume + " " + price + "\n");
     }
-       
+    private static Datapool datapool;       
     // variable
     private LinkedList<String> serverInfor;
     private LinkedList<String> commands;
-    // private LinkedList<TradeInfor> tradeInforList;
     private Vector<Vector<String>> books;
     private LinkedList<DataObserver> observers;
-    private LinkedList<Exception> errorList;
+    private LinkedList<Exception> errors;
     private LoginInfor loginInfor;
     private Socket socket;
     private Reader reader;
     private Writer writer;
+    private boolean loggedin;
+    private boolean bookChanged;
 
-    private static Datapool datapool;
     
     // constructor
     private Datapool(){
-	    this.loginInfor = null;
-	    this.serverInfor   = new LinkedList<String>();
-	    this.commands  = new LinkedList<String>();
-	    this.errorList = new LinkedList<Exception>();
-	    this.observers  = new LinkedList<DataObserver>();
-	    this.books     = new Vector<Vector<String>>();
+	this.loggedin = false;
+	this.bookChanged  = false;
+	this.loginInfor = null;
+	this.serverInfor   = new LinkedList<String>();
+	this.commands  = new LinkedList<String>();
+	this.errors = new LinkedList<Exception>();
+	this.observers  = new LinkedList<DataObserver>();
+	this.books     = new Vector<Vector<String>>();
     }
     // setter
 
     public void setServerInfor(String msg){
-	serverInfor.add(msg);
+	synchronized(serverInfor){
+	    serverInfor.add(msg);
+	}
     }
 
     public void setCommands(String msg){
-
-	commands.add(msg);
+	synchronized(commands){
+	    commands.add(msg);
+	}
     }
 
     public void setLoginInfor(LoginInfor infor){
@@ -112,17 +118,33 @@ class Datapool implements DataObservable{
     }
 
     public void setBooks(LinkedList<String> inputBooks){
-	books.clear();
-	for(int i = 0; i < inputBooks.size(); i++){
-	    String[] splited = inputBooks.get(i).split(" ");
-	    Vector<String> book = new Vector<String>();
-	    for(int j = 1; j < book.size(); j++){
-		book.add(splited[j]);
+	synchronized(books){
+	    books.clear();
+	    for(int i = 0; i < inputBooks.size(); i++){
+		String[] splited = inputBooks.get(i).split(" ");
+		Vector<String> book = new Vector<String>();
+		for(int j = 1; j < splited.length; j++){
+		    book.add(splited[j]);
+		}
+		books.add(book);
 	    }
-	    books.add(book);
+	}
+
+	this.bookChanged = true;
+    }
+
+    
+    public void addException(Exception e){
+	synchronized(errors){
+	    errors.add(e);
 	}
     }
-   
+
+    public void setBookChanged(boolean changed){
+	
+	    this.bookChanged = changed;
+	
+    }
     // getter
 
     public static Datapool getDatapool(){
@@ -133,28 +155,24 @@ class Datapool implements DataObservable{
     }
     
     public LinkedList<String> getServerInfor(){
-	return serverInfor;
-    }
-    // public Vector<Vector<String>> getBooks(){
-    // 	return this.books;
-    // }
-
-    public String[][] getBooks(){
-    	String[][] ret = new String[books.size()][5];
-	for(int i = 0; i < books.size(); i++){
-	    ret[i] = (String[])books.get(i).toArray();
+	synchronized(serverInfor){
+	    return serverInfor;
 	}
-
-	return ret;
     }
-    // public LinkedList<TradeInfor> getTradeInfor(){
-    // 	return tradeInforList;
-    // }
+    public Vector<Vector<String>> getBooks(){
+	synchronized(books){
+	    return books;
+	}
+    }
     public LinkedList<String> getCommands(){
-	return commands;
+	synchronized(commands){
+	    return commands;
+	}
     }
-    public LinkedList<Exception> getError(){
-	return errorList;
+    public LinkedList<Exception> getException(){
+	synchronized(errors){
+	    return errors;
+	}
     }
 
     // method
@@ -175,155 +193,89 @@ class Datapool implements DataObservable{
 	}
     }
 
+
+    public void printBook(){
+
+    	for(int i = 0; i < books.size(); i++){
+    	    for(int j = 0; j < books.get(i).size(); j++){
+    		System.out.print(books.get(i).get(j));
+    		System.out.print(" ");
+    	    }
+    	    System.out.println();
+    	}
+    }
+
+
     public void work(){
+	System.out.println("Working...");
+
 	while(true){
-	    // refresh();
-	    // if(isChanged())
+	    try {
+		Thread.sleep(1000);		
+	    }
+	    catch (Exception e) {
+		System.out.println("Error " + e.getMessage());
+		e.printStackTrace();
+	    }
+
+	    if(isLoggedIn() && isChanged()){
+
+		refresh();
 		notifyObservers();
+		// setBookChanged(false);
+
+	    }
 	    
 	}
 	
     }
 
-    public void addException(Exception e){
-	errorList.add(e);
+    public void refresh(){
+	commands.add(Datapool.BOOK + "\n");
+	setBookChanged(false);
     }
-    // public boolean isChanged(){
-    // 	return (!serverInfor.isEmpty()
-    // 		|| errorList.isEmpty()
-    // 		);
-    // }
 
-    // public void executeCommands() throws ServerErrorException, UnknownHostException, IOException {
-	
-    // 	String command;
-    // 	while((command = commands.poll()) != null){
-
-    // 	    String[] splited = command.split(" ");
-	    
-    // 	    // login
-    // 	    if(splited[0].equals(Datapool.LOGIN)){
-    // 		// login infor has a special format,
-    // 		// for it need to store the host information.
-    // 		// this command should be created by Datapool's
-    // 		// static methods.
-    // 		logIn(new LoginInfor(Integer.parseInt(splited[1]),
-    // 				     splited[2],
-    // 				     splited[3],
-    // 				     splited[4]));
-    // 	    }
-    // 	    // logout
-    // 	    if(splited[0].equals(Datapool.LOGOUT)){
-    // 		logOut();
-    // 	    }
-
-    // 	    // trade
-    // 	    if(splited[0].equals(Datapool.ASK) ||
-    // 	       splited[0].equals(Datapool.BID)){
-    // 		writer.write(command);
-    // 		refresh();
-
-    // 	    }
-		    
-    // 	    // cancel
-    // 	    if(splited[0].equals(Datapool.CANCEL)){
-    // 		writer.write(command);
-    // 		confirm();
-    // 		refresh();
-    // 		// deleteTrade(Integer.parseInt(splited[1]));
-    // 	    }
-
-    // 	    // book
-    // 	    if(splited[0].equals(Datapool.BOOK)){
-    // 		refresh();
-    // 	    }
-    // 	}
-       
-    // }
     
     public void logIn(LoginInfor infor) throws ServerErrorException, UnknownHostException, IOException{
-	
-	    // setLoginInfor(infor);
 	System.out.println("log in start");
 	this.socket = new Socket(infor.getHost(), infor.getPort());
 	this.reader = new Reader(socket.getInputStream(), this);
 	this.writer = new Writer(socket.getOutputStream(), this);
 	System.out.println("login infor:" + infor.toString());
 	writer.write(infor.toString());
+	System.out.println(reader.readFeedback());
+	
+	loggedin = true;
 	Thread readerThread = new Thread(reader);
 	Thread writerThread = new Thread(writer);
 	
 	readerThread.start();
 	writerThread.start();
-	// writer.write(infor.toString());
-	    
-	// confirm();
+	refresh();
 	    
     }
 
     public void logOut() throws IOException{
-	// setLoginInfor(null);
-
+	
+	loggedin = false;
 	writer.write("LOGOUT\n");
+	this.reader = null;
+	this.writer = null;
 	socket.close();
 	
     }
     
-    // public void deleteTrade(int id) {
-    // 	Iterator<TradeInfor> itr = tradeInforList.iterator();
-
-    // 	while(itr.hasNext()){
-    // 	    if(itr.next().getID() == id){
-    // 		itr.remove();
-    // 		break;
-    // 	    }
-    // 	}
-    // }
-
-    // public void refresh() throws ServerErrorException, IOException{
-
-	
-
-	
-	// writer.write(Datapool.cBOOK + "\n");
-	// List<String> books = reader.readBook();
-	// // BOOK return format:
-	// // BOOK id company volume price type\n
-	// if(!books.isEmpty()){
-	//     tradeInforList = new LinkedList<TradeInfor>();
-	//     Iterator<String> itr = books.iterator();
-	//     while(itr.hasNext()){
-	// 	String[] splited = itr.next().split(" ");
-	// 	tradeInforList.add(new TradeInfor(
-	// 			  splited[5], // type
-	// 			  splited[2], // company
-	// 			  splited[3], // volume
-	// 			  splited[4], // price
-	// 			  splited[1]  // id
-	// 					  ));
-	//     }
-
-	  
-	// }
-	
-    // }
-
-    // public String confirm() throws ServerErrorException, IOException{
-
-    // 	String[] splited = reader.readFeedback().split(" ");
-	
-    // 	return splited.length > 1? splited[0] : splited[1];
-
-    // }
-
-
     public boolean isLoggedIn(){
-
-	assert socket != null;
-	
-	return socket.isClosed();
+	return loggedin;
     }
-
+    
+    public boolean isChanged(){
+	
+	    return bookChanged         ||
+		!serverInfor.isEmpty() ||
+		!errors.isEmpty();
+	
+    }
 }
 // 
 // Datapool.java ends here

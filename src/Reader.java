@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 92
+//     Update #: 126
 // 
 
 // Code:
@@ -54,21 +54,28 @@ class Reader implements Runnable{
     public String readFeedback() throws ServerErrorException, IOException{
 	String line;
 
-	    while((line = br.readLine()) != null){
-		String[] splited = line.split(" ");
-		if(isError(splited[0]))
-		    throw new ServerErrorException(splited[1]);
+	while((line = br.readLine()) != null){
+		
+	    String[] splited = line.split(" ");
+	    if(isError(splited[0]))
+		throw new ServerErrorException(line);
 
-		else if(isFeedback(splited[0])) break;
+	    else if(isFeedback(splited[0])) break;
 	    
-		else if(isServerMsg(splited[0])){
-		    datapool.setServerInfor(line);
-		}
-
+	    else if(isServerMsg(splited[0])){
+		datapool.setServerInfor(line);
 	    }
-	
 
-	    return line;
+	}
+	
+	return line;
+    }
+
+    public String readLine() throws IOException{
+	String line = br.readLine();
+	System.out.println("readline: " + line);
+	return line;
+
     }
 
     public List<String> readBook() throws ServerErrorException, IOException{
@@ -79,7 +86,7 @@ class Reader implements Runnable{
 	while((line = br.readLine()) != null){
 	    String[] splited = line.split(" ");
 	    if(isError(splited[0]))
-		throw new ServerErrorException(splited[1]);
+		throw new ServerErrorException(line);
 
 	    if(splited[0].equals(Datapool.BOOK))
 		books.add(line);
@@ -91,17 +98,19 @@ class Reader implements Runnable{
 
     @Override
     public void run(){
-	
+	System.out.println("reader start");
 	while(datapool.isLoggedIn()){
-	    String line;
 
+	    System.out.println("reader running");
+	    String line;
+	    
 	    try{
 		while((line = br.readLine()) != null){
-		    System.out.println(line);
+		    // System.out.println(line);
 		    String[] splited = line.split(" ");
 
 		    if(isError(splited[0]))
-			throw new ServerErrorException(splited[1]);
+			throw new ServerErrorException(line);
 		    if(isFeedback(splited[0])) 
 			continue;
 		    if(isServerMsg(splited[0])){
@@ -112,23 +121,31 @@ class Reader implements Runnable{
 			LinkedList<String> books = new LinkedList<String>();
 			books.add(line);
 			while((line = br.readLine()) != null
-			      && !isBook(line.split(" ")[0])){
+			      && isBook(line.split(" ")[0])){
+
 			    // assume the feedback of book is not been separated
 			    // by other command.
+			    // System.out.println(line);
 			    books.add(line);
 			}
-
+			
 			datapool.setBooks(books);
 		    }
 
 		}		
 	    }catch(ServerErrorException see){
-		datapool.addException(see);
+		
+		    datapool.addException(see);
+		
 	    }catch(IOException ioe){
-		datapool.addException(ioe);
+		
+		    datapool.addException(ioe);
+		
 	    }
+	    
 
 	}
+	System.out.println("reader end");
     }
 
     public boolean isError(String input){

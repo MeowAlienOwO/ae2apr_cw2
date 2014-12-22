@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 45
+//     Update #: 53
 // 
 
 // Code:
@@ -56,18 +56,16 @@ class Writer implements Runnable{
 
     public void run(){
 	try {
-
+	    System.out.println("writer start");
 	    while(datapool.isLoggedIn()){
 		String command;
-		System.out.println(datapool.getCommands().isEmpty());
-		if((command = datapool.getCommands().poll()) != null){
-		    System.out.println("write command!");
-		    write(command);
+		while(!datapool.getCommands().isEmpty()){
+		    write(datapool.getCommands().poll());
 		}
-
 	    }	    
 	}
 	catch (IOException ioe) {
+	    ioe.printStackTrace();
 	    datapool.addException(ioe);
 	}
 
