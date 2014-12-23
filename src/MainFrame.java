@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 467
+//     Update #: 485
 // 
 
 // Code:
@@ -262,8 +262,9 @@ class MainFrame implements DataObserver{
 	this.cancel      = new JButton("Cancel...");
 
 	bottomRight.setBorder(bookBorder);
-	operation.add(refresh);
 	operation.add(cancel);
+	operation.add(refresh);
+
 
 	tableModel.setDataVector(datapool.getBooks(), 
 				 new Vector(Arrays.asList(MainFrame.COLUMN_NAME)));
@@ -300,17 +301,20 @@ class MainFrame implements DataObserver{
 	ask.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
 		    TradeFrame ask;
-		    if(datapool.isLoggedIn())
+		    if(datapool.isLoggedIn()){
 			ask = new TradeFrame("ASK", datapool);
+			// datapool.refresh();
+		    }
 		}
 	    });
 	bid.addActionListener(new ActionListener(){
 		
 		public void actionPerformed(ActionEvent e){
 		    TradeFrame bid;
-		    if(datapool.isLoggedIn())
+		    if(datapool.isLoggedIn()){
 			bid = new TradeFrame("BID", datapool);
-
+			// datapool.refresh();
+		    }
 		}
 	    });
 
@@ -320,7 +324,8 @@ class MainFrame implements DataObserver{
 		    if(datapool.isLoggedIn()){
 
 			datapool.refresh();
-			book.updateUI();
+			// book.updateUI();
+			tableModel.fireTableDataChanged();
 		    }
 		}
 	    });
@@ -356,6 +361,7 @@ class MainFrame implements DataObserver{
 			    }
 			}
 		    }
+		    datapool.refresh();
 		}
 
 	    });
@@ -396,20 +402,24 @@ class MainFrame implements DataObserver{
     }
 
     private void updateTickmsg(){
-	LinkedList<String> serverInfor = datapool.getServerInfor();
+	// LinkedList<String> serverInfor = datapool.getServerInfor();
 	String infor;
-	while((infor = serverInfor.poll()) != null){
+	while((infor = datapool.getServerInfor().poll()) != null){
+	    System.out.println("Server Infor: " + infor);
 	    String[] splited = infor.split(" ");
 	    if(splited[0].equals(Datapool.TICK)){
 		String tick = splited[1];
 		for(int i = 2; i < splited.length; i++){
-		    tick.concat(splited[i]).concat(" ");
+		    // tick.concat(splited[i]).concat(" ");
+		    tick = tick + " " + splited[i];
 		}
 		tickmsg.append(tick + "\n");
 	    } else if(splited[0].equals(Datapool.EXEC)){
-		String exec = "????";
+		// String exec = "????";
+		String exec = datapool.getCompanyName(splited[1]);
 		for(int i = 1; i < splited.length; i++){
-		    exec.concat(splited[i]).concat(" ");
+		    // exec.concat(" ").concat(splited[i]);
+		    exec = exec + " " + splited[i];
 		}
 		tickmsg.append(exec + "<<<<<<<<<<\n");
 	    }
@@ -423,12 +433,13 @@ class MainFrame implements DataObserver{
     }
 
     private void updateBook(){
-	SwingUtilities.invokeLater(new Runnable(){
-		public void run(){
-		    tableModel.fireTableDataChanged();
-		}
-	    });
-
+	// SwingUtilities.invokeLater(new Runnable(){
+	// 	public void run(){
+	// 	    // tableModel.fireTableDataChanged();
+	// 	    // book.updateUI();
+	// 	}
+	//     });
+	tableModel.fireTableDataChanged();
 
     }
     public JTextArea getTickArea(){

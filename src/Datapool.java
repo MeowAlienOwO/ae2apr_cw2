@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 460
+//     Update #: 478
 // 
 
 // Code:
@@ -126,9 +126,14 @@ class Datapool implements DataObservable{
 	    for(int i = 0; i < inputBooks.size(); i++){
 		String[] splited = inputBooks.get(i).split(" ");
 		Vector<String> book = new Vector<String>();
-		for(int j = 1; j < splited.length; j++){
-		    book.add(splited[j]);
-		}
+		// for(int j = 1; j < splited.length; j++){
+		//     book.add(splited[j]);
+		// }
+		book.add(splited[1]);			       // id
+		book.add(splited[5].equals("A")? "ASK":"BID"); // type
+		book.add(splited[2]);			       // company
+		book.add(splited[3]);			       // volume
+		book.add(splited[4]);			       // price
 		books.add(book);
 	    }
 	}
@@ -181,6 +186,15 @@ class Datapool implements DataObservable{
 	}
     }
 
+    public String getCompanyName(String id){
+	for(int i = 0; i < books.size(); i++){
+	    if(books.get(i).get(0).equals(id)){
+		return books.get(i).get(2);
+	    }
+	}
+	return "????";
+    }
+
     // method
     @Override
     public void attach(DataObserver o){
@@ -199,19 +213,6 @@ class Datapool implements DataObservable{
 	}
     }
 
-
-    // public void printBook(){
-
-    // 	for(int i = 0; i < books.size(); i++){
-    // 	    for(int j = 0; j < books.get(i).size(); j++){
-    // 		System.out.print(books.get(i).get(j));
-    // 		System.out.print(" ");
-    // 	    }
-    // 	    System.out.println();
-    // 	}
-    // }
-
-
     public void work(){
 	System.out.println("Working...");
 
@@ -224,13 +225,12 @@ class Datapool implements DataObservable{
 		e.printStackTrace();
 	    }
 	    
-	    System.out.println("hasCommand:" + hasCommand);
+
 	    if(isLoggedIn() && isChanged()){
-		System.out.println("update GUI!");
-		refresh();
+		// refresh();
+		System.out.println("notify Observers!");
 		notifyObservers();
 		this.hasCommand = false;
-
 	    }
 	    
 	}
@@ -240,6 +240,7 @@ class Datapool implements DataObservable{
     public void refresh(){
 	// commands.add(Datapool.BOOK + "\n");
 	setCommands(Datapool.BOOK + "\n");
+	this.hasCommand = true;
     }
 
     

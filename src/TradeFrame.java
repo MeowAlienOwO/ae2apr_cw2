@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 57
+//     Update #: 67
 // 
 
 // Code:
@@ -42,7 +42,20 @@ class TradeFrame{
 
 	setType(type);
 	this.datapool = datapool;
+	setLayout();
+	setAction();
 
+	frame.setVisible(true);
+	frame.setResizable(false);
+
+
+    }
+    // setter
+    public void setType(String type){
+	this.type = type;
+    }
+    
+    private void setLayout(){
 	
 	this.company = new JTextField(20);
 	this.volume  = new JTextField(20);
@@ -65,6 +78,19 @@ class TradeFrame{
 	this.buttonPanel  = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 	buttonPanel.add(ok);
 	buttonPanel.add(cancel);
+	this.panel = new JPanel(new GridLayout(4, 1));
+	panel.add(companyPanel);
+	panel.add(volumePanel);
+	panel.add(pricePanel);
+	panel.add(buttonPanel);
+
+	this.frame = new JFrame(type);
+	frame.add(panel);
+	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	frame.pack();
+
+    }
+    private void setAction(){
 	cancel.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e){
 
@@ -81,10 +107,11 @@ class TradeFrame{
 			String priceText   = price.getText();
 			
 			datapool.setCommands(Datapool.CreateTrade(
-					    type,
-					    companyText,
-					    volumeText,
-					    priceText ));
+								  type,
+								  companyText,
+								  volumeText,
+								  priceText ));
+			datapool.refresh();
 			frame.dispose();
 		    }
 		    catch (NullPointerException npe) {
@@ -95,25 +122,9 @@ class TradeFrame{
 		}
 	    });
 
-	this.panel = new JPanel(new GridLayout(4, 1));
-	panel.add(companyPanel);
-	panel.add(volumePanel);
-	panel.add(pricePanel);
-	panel.add(buttonPanel);
-
-	this.frame = new JFrame(type);
-	frame.add(panel);
-	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	frame.pack();
-	frame.setVisible(true);
-	frame.setResizable(false);
-
-
     }
-
-    public void setType(String type){
-	this.type = type;
-    }
+    // method
+    
 }
 
 // 

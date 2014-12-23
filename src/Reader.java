@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 126
+//     Update #: 129
 // 
 
 // Code:
@@ -52,48 +52,48 @@ class Reader implements Runnable{
     // methods
 
     public String readFeedback() throws ServerErrorException, IOException{
-	String line;
+    	String line;
 
-	while((line = br.readLine()) != null){
+    	while((line = br.readLine()) != null){
 		
-	    String[] splited = line.split(" ");
-	    if(isError(splited[0]))
-		throw new ServerErrorException(line);
+    	    String[] splited = line.split(" ");
+    	    if(isError(splited[0]))
+    		throw new ServerErrorException(line);
 
-	    else if(isFeedback(splited[0])) break;
+    	    else if(isFeedback(splited[0])) break;
 	    
-	    else if(isServerMsg(splited[0])){
-		datapool.setServerInfor(line);
-	    }
+    	    else if(isServerMsg(splited[0])){
+    		datapool.setServerInfor(line);
+    	    }
 
-	}
+    	}
 	
-	return line;
+    	return line;
     }
 
-    public String readLine() throws IOException{
-	String line = br.readLine();
-	System.out.println("readline: " + line);
-	return line;
+    // public String readLine() throws IOException{
+    // 	String line = br.readLine();
+    // 	System.out.println("readline: " + line);
+    // 	return line;
 
-    }
+    // }
 
-    public List<String> readBook() throws ServerErrorException, IOException{
-	LinkedList<String> books = new LinkedList<String>();
+    // public List<String> readBook() throws ServerErrorException, IOException{
+    // 	LinkedList<String> books = new LinkedList<String>();
 
-	String line;
+    // 	String line;
 
-	while((line = br.readLine()) != null){
-	    String[] splited = line.split(" ");
-	    if(isError(splited[0]))
-		throw new ServerErrorException(line);
+    // 	while((line = br.readLine()) != null){
+    // 	    String[] splited = line.split(" ");
+    // 	    if(isError(splited[0]))
+    // 		throw new ServerErrorException(line);
 
-	    if(splited[0].equals(Datapool.BOOK))
-		books.add(line);
-	}
+    // 	    if(splited[0].equals(Datapool.BOOK))
+    // 		books.add(line);
+    // 	}
 
-	return books;
-    }
+    // 	return books;
+    // }
 
 
     @Override
@@ -125,7 +125,7 @@ class Reader implements Runnable{
 
 			    // assume the feedback of book is not been separated
 			    // by other command.
-			    // System.out.println(line);
+			    System.out.println(line);
 			    books.add(line);
 			}
 			
