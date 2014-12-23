@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 53
+//     Update #: 55
 // 
 
 // Code:
@@ -62,6 +62,7 @@ class Writer implements Runnable{
 		while(!datapool.getCommands().isEmpty()){
 		    write(datapool.getCommands().poll());
 		}
+		// datapool.setHasCommand(false);
 	    }	    
 	}
 	catch (IOException ioe) {

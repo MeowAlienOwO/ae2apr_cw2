@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 464
+//     Update #: 467
 // 
 
 // Code:
@@ -319,9 +319,8 @@ class MainFrame implements DataObserver{
 		public void actionPerformed(ActionEvent e){
 		    if(datapool.isLoggedIn()){
 
-			// tableModel.fireTableDataChanged();
-			// datapool.setBookChanged(false);
 			datapool.refresh();
+			book.updateUI();
 		    }
 		}
 	    });
@@ -424,7 +423,13 @@ class MainFrame implements DataObserver{
     }
 
     private void updateBook(){
-	tableModel.fireTableDataChanged();
+	SwingUtilities.invokeLater(new Runnable(){
+		public void run(){
+		    tableModel.fireTableDataChanged();
+		}
+	    });
+
+
     }
     public JTextArea getTickArea(){
 	return tickmsg;

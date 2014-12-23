@@ -17,7 +17,7 @@
 // Status: 
 // Table of Contents: 
 // 
-//     Update #: 440
+//     Update #: 460
 // 
 
 // Code:
@@ -85,13 +85,13 @@ class Datapool implements DataObservable{
     private Reader reader;
     private Writer writer;
     private boolean loggedin;
-    private boolean bookChanged;
-
+    // private boolean bookChanged;
+    private boolean hasCommand;
     
     // constructor
     private Datapool(){
 	this.loggedin = false;
-	this.bookChanged  = false;
+	// this.bookChanged  = false;
 	this.loginInfor = null;
 	this.serverInfor   = new LinkedList<String>();
 	this.commands  = new LinkedList<String>();
@@ -110,7 +110,10 @@ class Datapool implements DataObservable{
     public void setCommands(String msg){
 	synchronized(commands){
 	    commands.add(msg);
+
 	}
+	
+	this.hasCommand = true;
     }
 
     public void setLoginInfor(LoginInfor infor){
@@ -130,7 +133,7 @@ class Datapool implements DataObservable{
 	    }
 	}
 
-	this.bookChanged = true;
+	// this.bookChanged = true;
     }
 
     
@@ -140,11 +143,14 @@ class Datapool implements DataObservable{
 	}
     }
 
-    public void setBookChanged(boolean changed){
-	
-	    this.bookChanged = changed;
-	
+    public void setHasCommand(boolean hasCommand){
+	this.hasCommand = hasCommand;
     }
+    // public void setBookChanged(boolean changed){
+	
+    // 	    this.bookChanged = changed;
+	
+    // }
     // getter
 
     public static Datapool getDatapool(){
@@ -194,16 +200,16 @@ class Datapool implements DataObservable{
     }
 
 
-    public void printBook(){
+    // public void printBook(){
 
-    	for(int i = 0; i < books.size(); i++){
-    	    for(int j = 0; j < books.get(i).size(); j++){
-    		System.out.print(books.get(i).get(j));
-    		System.out.print(" ");
-    	    }
-    	    System.out.println();
-    	}
-    }
+    // 	for(int i = 0; i < books.size(); i++){
+    // 	    for(int j = 0; j < books.get(i).size(); j++){
+    // 		System.out.print(books.get(i).get(j));
+    // 		System.out.print(" ");
+    // 	    }
+    // 	    System.out.println();
+    // 	}
+    // }
 
 
     public void work(){
@@ -217,12 +223,13 @@ class Datapool implements DataObservable{
 		System.out.println("Error " + e.getMessage());
 		e.printStackTrace();
 	    }
-
+	    
+	    System.out.println("hasCommand:" + hasCommand);
 	    if(isLoggedIn() && isChanged()){
-
+		System.out.println("update GUI!");
 		refresh();
 		notifyObservers();
-		// setBookChanged(false);
+		this.hasCommand = false;
 
 	    }
 	    
@@ -231,17 +238,17 @@ class Datapool implements DataObservable{
     }
 
     public void refresh(){
-	commands.add(Datapool.BOOK + "\n");
-	setBookChanged(false);
+	// commands.add(Datapool.BOOK + "\n");
+	setCommands(Datapool.BOOK + "\n");
     }
 
     
     public void logIn(LoginInfor infor) throws ServerErrorException, UnknownHostException, IOException{
-	System.out.println("log in start");
+	// System.out.println("log in start");
 	this.socket = new Socket(infor.getHost(), infor.getPort());
 	this.reader = new Reader(socket.getInputStream(), this);
 	this.writer = new Writer(socket.getOutputStream(), this);
-	System.out.println("login infor:" + infor.toString());
+	// System.out.println("login infor:" + infor.toString());
 	writer.write(infor.toString());
 	System.out.println(reader.readFeedback());
 	
@@ -271,8 +278,8 @@ class Datapool implements DataObservable{
     
     public boolean isChanged(){
 	
-	    return bookChanged         ||
-		!serverInfor.isEmpty() ||
+	    return !serverInfor.isEmpty() || 
+		hasCommand             ||
 		!errors.isEmpty();
 	
     }
